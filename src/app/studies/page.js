@@ -1,25 +1,22 @@
 "use client";
 
 import { useSelector } from "react-redux";
-import { RootState } from "@/lib/store"; // Adjust this import based on your store location
 import Welcome from "@/components/Welcome";
 import Link from "next/link";
-import { Helmet } from "react-helmet-async";
+import Head from "next/head";
 
 export default function StudiesPage() {
-  const { notes, language } = useSelector(
-    (state: RootState) => state.rootReducer
-  );
+  const { notes, language } = useSelector((state) => state.rootReducer);
 
   return (
     <div className="p-8 space-y-8">
-      <Helmet>
+      <Head>
         <title>Project: {language[0]?.Title}</title>
         <meta
           name="description"
           content={`Description: ${language[0]?.Category}`}
         />
-      </Helmet>
+      </Head>
 
       <Welcome />
 

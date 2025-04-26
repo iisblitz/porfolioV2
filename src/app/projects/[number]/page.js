@@ -1,108 +1,125 @@
-'use client'
-import React, { useEffect, useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import Link from "next/link";
 import Welcome from "../../../components/Welcome";
 import Head from "next/head";
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 
-export default function Projects() {
-  const loadData = useSelector((state) => state.rootReducer);
-  const router = useRouter();
+export default function ProjectDetailPage() {
+  const { number } = useParams(); // 🔥 correct dynamic param
+  const { arts, language, texts } = useSelector((state) => state.rootReducer);
+
   const [state, setState] = useState({
-    url: "",
-    details: {},
-    texts: [],
-    language: "",
+    detail: null,
     loading: true,
+    textLabels: null,
   });
 
   useEffect(() => {
-    if (router.isReady) {
-      const { language, texts, arts } = loadData;
-      const url = router.query.projectId; // Replace `projectId` with your dynamic route parameter name
-      const details = arts.filter((e) => e.number === url);
-      setState({ loading: false, url, details, language, texts });
+    if (number && arts.length > 0) {
+      const filtered = arts.find((art) => art.number === number);
+      const labels = texts.find((text) => text.language === language);
+
+      setState({
+        detail: filtered || null,
+        loading: false,
+        textLabels: labels || null,
+      });
     }
-  }, [router.isReady, router.query.projectId, loadData]);
+  }, [number, arts, language, texts]);
 
   if (state.loading) {
-    return <div>...Loading</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
-  const { details } = state;
-  if (!details || details.length === 0) {
-    return <div>Details not found</div>;
+  if (!state.detail) {
+    return <div className="text-center mt-10">Project not found.</div>;
   }
 
-  const detail = details.find((e) => e.Langauge === loadData.language);
-
-  if (!detail) {
-    return <div>Details not available for the selected language</div>;
-  }
-
-  const text = state.texts.find((e) => e.language === state.language);
+  const { detail, textLabels } = state;
 
   return (
-    <div className="A3F">
+    <div className="A3F p-4">
       <Head>
-        <title>{`Project: ${loadData.language[0].Title}`}</title>
+        <title>Project: {detail?.Title || "Project"}</title>
         <meta
           name="description"
-          content={`Description: ${loadData.language[0].pd}`}
+          content={
+            detail?.ProblemDescription?.substring(0, 150) || "Project Details"
+          }
         />
       </Head>
+
       <Welcome />
-      <h1>{detail.Title}</h1>
-      <div className="Cols">
-        <div className="backGround">
+
+      <h1 className="text-3xl font-bold mb-6">{detail.Title}</h1>
+
+      <div className="grid md:grid-cols-3 gap-8">
+        <div className="backGround space-y-4">
           <div className="A3Ftitle">
-            <h2>{text?.bg}</h2>
+            <h2 className="text-2xl">{textLabels?.bg}</h2>
           </div>
           <div className="probDesc">
-            <h3>{text?.pd}</h3>
+            <h3 className="font-semibold">{textLabels?.pd}</h3>
             <p>{detail.ProblemDescription}</p>
           </div>
           <div className="desiredState">
-            <h3>{text?.ds}</h3>
+            <h3 className="font-semibold">{textLabels?.ds}</h3>
             <p>{detail.DesiredState}</p>
           </div>
           <div className="goal">
-            <h3>{text?.g}</h3>
+            <h3 className="font-semibold">{textLabels?.g}</h3>
             <p>{detail.Goals}</p>
           </div>
         </div>
-        <div className="Solution">
+
+        <div className="Solution space-y-4">
           <div className="A3Ftitle">
-            <h2>{text?.ex}</h2>
+            <h2 className="text-2xl">{textLabels?.ex}</h2>
           </div>
           <div className="Tools">
-            <h3>{text?.tools}:</h3>
-            {detail.Tools}
+            <h3 className="font-semibold">{textLabels?.tools}:</h3>
+            <p>{detail.Tools}</p>
           </div>
           <div className="Plan">
-            <h3>{text?.plan}</h3>
-            <ol>
-              {detail.Plan.split('","').map((item, index) => (
-                <li key={index}>{item}</li>
+            <h3 className="font-semibold">{textLabels?.plan}</h3>
+            <ol className="list-decimal ml-4">
+              {detail.Plan?.split('","').map((item, idx) => (
+                <li key={idx}>{item}</li>
               ))}
             </ol>
           </div>
         </div>
-        <div className="Results">
+
+        <div className="Results space-y-4">
           <div className="A3Ftitle">
-            <h2>{text?.del}</h2>
+            <h2 className="text-2xl">{textLabels?.del}</h2>
           </div>
           <div className="status">
             <p>Status: {detail.Status}</p>
           </div>
           <div className="Deliverable">
-            <img src={detail.Image} alt="DeliverablePic" />
+            <img
+              src={detail.Image}
+              alt="DeliverablePic"
+              className="rounded shadow-md"
+            />
           </div>
           <div className="link">
             <h3>
-              <a href={detail.Deliverable}>
-                {state.language === "ESP"
+              <a
+                href={detail.Deliverable}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline"
+              >
+                {language === "ESP"
                   ? "Entregable en Google Drive"
                   : "Deliverable link in Google Drive"}
               </a>
@@ -110,9 +127,14 @@ export default function Projects() {
           </div>
         </div>
       </div>
-      <Link href="../">
-        <a>{state.language === "ESP" ? "Regresar" : "Go Back"}</a>
-      </Link>
+
+      <div className="mt-10">
+        <Link href="/projects">
+          <div className="inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+            {language === "ESP" ? "Regresar" : "Go Back"}
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }

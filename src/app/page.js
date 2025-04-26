@@ -9,16 +9,16 @@ export default function LandingPage() {
       <nav className="landing-nav">
         <ul>
           <li>
-            <Link href="/work">Work</Link>
-          </li>
-          <li>
-            <Link href="/project">Projects</Link>
-          </li>
-          <li>
             <Link href="/article">Articles</Link>
           </li>
           <li>
-            <Link href="/study">Studies</Link>
+            <Link href="/studies">Studies</Link>
+          </li>
+          <li>
+            <Link href="/projects">Projects</Link>
+          </li>
+          <li>
+            <Link href="/work">Work</Link>
           </li>
           <li>
             <Link href="/maintenance">Maintenance</Link>
@@ -28,4 +28,3 @@ export default function LandingPage() {
     </main>
   );
 }
- 

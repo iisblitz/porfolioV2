@@ -15,7 +15,6 @@ const composeEnhancers =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
   compose;
 
-console.log("Thunk:", thunk);
 const middlewares = [thunk];
 const store = configureStore({
   reducer: rootReducer,
